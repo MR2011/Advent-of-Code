@@ -8,13 +8,6 @@ using namespace std;
 const int PLAYERS = 438;
 const int LAST_MARBLE_POINTS = 71626 * 100;
 
-void print_list(list<int> l){
-	for(auto i=l.begin(); i != l.end(); i++){
-		cout << *i << " ";
-	}
-	cout << endl;
-}
-
 list<int>::iterator next(list<int>::iterator &it, list<int> &l){
 	if(++it == l.end())
 		it = l.begin();
