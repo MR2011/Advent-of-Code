@@ -54,7 +54,6 @@ void execute_instruction(Instruction i, vector<long> &r){
 
 void part1(vector<Instruction> instructions, int ip){
 	vector<long> r(6, 0);
-	r[0] = 1;
 	while(r[ip] < instructions.size()){
 		execute_instruction(instructions[r[ip]], r);
 		r[ip]++;
