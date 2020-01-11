@@ -1,61 +1,4 @@
-enum Opcode {
-    ADD,
-    MULTIPLY,
-    HALT,
-}
-
-impl Opcode {
-    fn new(from: i32) -> Option<Opcode> {
-        match from {
-            1 => Some(Opcode::ADD),
-            2 => Some(Opcode::MULTIPLY),
-            99 => Some(Opcode::HALT),
-            _ => None,
-        }
-    }
-}
-struct VM {
-    ip: usize,
-    memory: Vec<i32>,
-}
-
-impl VM {
-    pub fn new(input: Vec<i32>) -> VM {
-        VM {
-            ip: 0,
-            memory: input,
-        }
-    }
-
-    fn run(&mut self) {
-        loop {
-            match Opcode::new(self.memory[self.ip]) {
-                Some(Opcode::ADD) => self.add(),
-                Some(Opcode::MULTIPLY) => self.multiply(),
-                Some(Opcode::HALT) => break,
-                _ => break,
-            }
-        }
-    }
-
-    fn add(&mut self) {
-        let (dst, src2, src1) = self.get_operators();
-        self.memory[dst] = self.memory[src1] + self.memory[src2];
-        self.ip += 4;
-    }
-
-    fn multiply(&mut self) {
-        let (dst, src2, src1) = self.get_operators();
-        self.memory[dst] = self.memory[src1] * self.memory[src2];
-        self.ip += 4;
-    }
-
-    fn get_operators(&mut self) -> (usize, usize, usize) {
-        (self.memory[self.ip+3] as usize,
-         self.memory[self.ip+2] as usize,
-         self.memory[self.ip+1] as usize)
-    }
-}
+use crate::intcode::VM;
 
 #[aoc_generator(day2)]
 pub fn prepare_input(input: &str) -> Vec<i32> {
@@ -74,9 +17,9 @@ pub fn prepare_test_input(input: &str) -> Vec<i32> {
 
 #[aoc(day2, part1)]
 pub fn solve_part1(input: &Vec<i32>) -> i32 {
-    let mut vm = VM::new(input.clone());
+    let mut vm = VM::new(input.clone(), Vec::new());
     vm.run();
-    vm.memory[0]
+    vm.get(0)
 }
 
 #[aoc(day2, part2)]
@@ -86,9 +29,9 @@ pub fn solve_part2(input: &Vec<i32>) -> i32 {
             let mut input_clone = input.clone();
             input_clone[1] = noun;
             input_clone[2] = verb;
-            let mut vm = VM::new(input_clone);
+            let mut vm = VM::new(input_clone, Vec::new());
             vm.run();
-            if vm.memory[0] == 19690720 {
+            if vm.get(0) == 19690720 {
                 return 100 * noun + verb;
             }
         }

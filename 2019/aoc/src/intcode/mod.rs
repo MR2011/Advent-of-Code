@@ -172,4 +172,8 @@ impl VM {
             Mode::IMMEDIATE => self.ip + offset,
         }
     }
+
+    pub fn get(self, index: usize) -> i32 {
+        self.memory[index]
+    }
 }
