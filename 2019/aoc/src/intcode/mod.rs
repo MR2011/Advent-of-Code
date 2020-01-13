@@ -1,28 +1,36 @@
 
 #[derive(Debug)]
 enum Opcode {
-    ADD,
-    MULTIPLY,
-    READ,
-    WRITE,
-    JUMP_TRUE,
-    JUMP_FALSE,
-    LESS,
-    EQUAL,
-    HALT,
+    Add,
+    Multiply,
+    Read,
+    Write,
+    JumpTrue,
+    JumpFalse,
+    Less,
+    Equal,
+    Halt,
+}
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub enum State {
+    Halted,
+    NeedInput,
+    NewOutput,
+    OK,
 }
 
 #[derive(Debug)]
 pub enum Mode {
-    POSITION,
-    IMMEDIATE,
+    Position,
+    Immediate,
 }
 
 impl Mode {
     fn new(from: i32) -> Option<Mode> {
         match from {
-            0 => Some(Mode::POSITION),
-            1 => Some(Mode::IMMEDIATE),
+            0 => Some(Mode::Position),
+            1 => Some(Mode::Immediate),
             _ => None,
         }
     }
@@ -33,15 +41,15 @@ type ModeSet = (Mode, Mode, Mode);
 impl Opcode {
     fn new(from: i32) -> Option<Opcode> {
         match from {
-            1 => Some(Opcode::ADD),
-            2 => Some(Opcode::MULTIPLY),
-            3 => Some(Opcode::READ),
-            4 => Some(Opcode::WRITE),
-            5 => Some(Opcode::JUMP_TRUE),
-            6 => Some(Opcode::JUMP_FALSE),
-            7 => Some(Opcode::LESS),
-            8 => Some(Opcode::EQUAL),
-            99 => Some(Opcode::HALT),
+            1 => Some(Opcode::Add),
+            2 => Some(Opcode::Multiply),
+            3 => Some(Opcode::Read),
+            4 => Some(Opcode::Write),
+            5 => Some(Opcode::JumpTrue),
+            6 => Some(Opcode::JumpFalse),
+            7 => Some(Opcode::Less),
+            8 => Some(Opcode::Equal),
+            99 => Some(Opcode::Halt),
             _ => None,
         }
     }
@@ -69,6 +77,7 @@ pub struct VM {
     memory: Vec<i32>,
     input: Vec<i32>,
     pub output: Vec<i32>,
+    state: State,
 }
 
 impl VM {
@@ -78,48 +87,72 @@ impl VM {
             memory: memory,
             input: input,
             output: Vec::new(),
+            state: State::OK,
         }
     }
 
-    pub fn run(&mut self) {
-        loop {
-            let instruction = Instruction::new(self.memory[self.ip]);
-            match instruction.opcode {
-                Opcode::ADD => self.add(instruction.modes),
-                Opcode::MULTIPLY => self.multiply(instruction.modes),
-                Opcode::READ => self.read(),
-                Opcode::WRITE => self.write(instruction.modes),
-                Opcode::JUMP_TRUE => self.jump_if_true(instruction.modes),
-                Opcode::JUMP_FALSE => self.jump_if_false(instruction.modes),
-                Opcode::LESS => self.less(instruction.modes),
-                Opcode::EQUAL => self.equals(instruction.modes),
-                Opcode::HALT => break,
-            }
+    pub fn run(&mut self) -> State {
+        self.state = State::OK;
+        while self.state != State::NeedInput && self.state != State::Halted {
+            self.tick();
         }
+        self.state
+    }
+
+    pub fn run_until_new_state(&mut self) -> State {
+        self.state = State::OK;
+        while self.state == State::OK {
+            self.tick();
+        }
+        self.state
+    }
+
+    pub fn tick(&mut self) -> State {
+        let instruction = Instruction::new(self.memory[self.ip]);
+        match instruction.opcode {
+            Opcode::Add => self.add(instruction.modes),
+            Opcode::Multiply => self.multiply(instruction.modes),
+            Opcode::Read => self.read(),
+            Opcode::Write => self.write(instruction.modes),
+            Opcode::JumpTrue => self.jump_if_true(instruction.modes),
+            Opcode::JumpFalse => self.jump_if_false(instruction.modes),
+            Opcode::Less => self.less(instruction.modes),
+            Opcode::Equal => self.equals(instruction.modes),
+            Opcode::Halt => self.state = State::Halted,
+        }
+        return self.state;
     }
 
     fn add(&mut self, modes: ModeSet) {
         let (src1, src2, dst) = self.get_addresses(modes);
         self.memory[dst] = self.memory[src1] + self.memory[src2];
         self.ip += 4;
+        self.state = State::OK;
     }
 
     fn multiply(&mut self, modes: ModeSet) {
         let (src1, src2, dst) = self.get_addresses(modes);
         self.memory[dst] = self.memory[src1] * self.memory[src2];
         self.ip += 4;
+        self.state = State::OK;
     }
 
     fn read(&mut self) {
-        let dst = self.get_address(1, Mode::POSITION);
-        self.memory[dst] = self.input.remove(0);
-        self.ip += 2;
+        if self.input.is_empty() {
+            self.state = State::NeedInput;
+        }else {
+            let dst = self.get_address(1, Mode::Position);
+            self.memory[dst] = self.input.remove(0);
+            self.ip += 2;
+            self.state = State::OK;
+        }
     }
 
     fn write(&mut self, modes: ModeSet) {
         let src = self.get_address(1, modes.0);
         self.output.push(self.memory[src]);
         self.ip += 2;
+        self.state = State::NewOutput;
     }
 
     fn jump_if_true(&mut self, modes: ModeSet) {
@@ -129,6 +162,7 @@ impl VM {
         }else {
             self.ip += 3;
         }
+        self.state = State::OK;
     }
 
     fn jump_if_false(&mut self, modes: ModeSet) {
@@ -138,6 +172,7 @@ impl VM {
         }else {
             self.ip += 3;
         }
+        self.state = State::OK;
     }
 
     fn less(&mut self, modes: ModeSet) {
@@ -148,6 +183,7 @@ impl VM {
             self.memory[dst] = 0;
         }
         self.ip += 4;
+        self.state = State::OK;
     }
 
     fn equals(&mut self, modes: ModeSet) {
@@ -158,6 +194,7 @@ impl VM {
             self.memory[dst] = 0;
         }
         self.ip += 4;
+        self.state = State::OK;
     }
 
     fn get_addresses(&mut self, modes: ModeSet) -> (usize, usize, usize) {
@@ -168,12 +205,17 @@ impl VM {
 
     fn get_address(&mut self, offset: usize, mode: Mode) -> usize {
         match mode {
-            Mode::POSITION => self.memory[self.ip + offset] as usize,
-            Mode::IMMEDIATE => self.ip + offset,
+            Mode::Position => self.memory[self.ip + offset] as usize,
+            Mode::Immediate => self.ip + offset,
         }
     }
 
     pub fn get(self, index: usize) -> i32 {
         self.memory[index]
     }
+
+    pub fn feed_input(&mut self, item: i32) {
+        self.input.push(item);
+    }
+
 }

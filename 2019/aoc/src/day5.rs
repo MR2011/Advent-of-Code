@@ -14,7 +14,7 @@ pub fn solve_part1(input: &Vec<i32>) -> i32 {
     read_input.push(1);
     let mut vm = VM::new(input.clone(), read_input);
     vm.run();
-    return vm.output.last().cloned().unwrap()
+    vm.output.pop().unwrap()
 }
 
 #[aoc(day5, part2)]
@@ -23,5 +23,5 @@ pub fn solve_part2(input: &Vec<i32>) -> i32 {
     read_input.push(5);
     let mut vm = VM::new(input.clone(), read_input);
     vm.run();
-    return vm.output.last().cloned().unwrap()
+    vm.output.pop().unwrap()
 }
