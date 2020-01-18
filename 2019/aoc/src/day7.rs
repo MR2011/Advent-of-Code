@@ -8,7 +8,7 @@ pub struct AmplifierCircuit {
 }
 
 impl AmplifierCircuit{
-    fn new(program: &Vec<i32>, phases: Vec<i32>) -> AmplifierCircuit {
+    fn new(program: &Vec<i64>, phases: Vec<i64>) -> AmplifierCircuit {
         AmplifierCircuit {
             amps: phases
                     .iter()
@@ -18,7 +18,7 @@ impl AmplifierCircuit{
     }
 
 
-    fn run(&mut self, init: i32) -> i32 {
+    fn run(&mut self, init: i64) -> i64 {
         let mut output = init;
         for amp in &mut self.amps {
             amp.feed_input(output);
@@ -28,7 +28,7 @@ impl AmplifierCircuit{
         output
     }
 
-    fn run_feedback(&mut self) -> i32 {
+    fn run_feedback(&mut self) -> i64 {
         let mut output = 0;
         let mut halted = false;
         while !halted {
@@ -48,15 +48,15 @@ impl AmplifierCircuit{
 }
 
 #[aoc_generator(day7)]
-pub fn prepare_input(input: &str) -> Vec<i32> {
-    let tokens: Vec<i32> = input.trim().split(",")
-        .map(|token| token.parse::<i32>().unwrap())
+pub fn prepare_input(input: &str) -> Vec<i64> {
+    let tokens: Vec<i64> = input.trim().split(",")
+        .map(|token| token.parse::<i64>().unwrap())
         .collect();
     tokens
 }
 
 #[aoc(day7, part1)]
-pub fn solve_part1(input: &Vec<i32>) -> i32 {
+pub fn solve_part1(input: &Vec<i64>) -> i64 {
     let mut max_signal = 0;
     for phases in permute::permute(vec![0, 1, 2, 3, 4]) {
         let mut circuit = AmplifierCircuit::new(input, phases);
@@ -66,7 +66,7 @@ pub fn solve_part1(input: &Vec<i32>) -> i32 {
 }
 
 #[aoc(day7, part2)]
-pub fn solve_part2(input: &Vec<i32>) -> i32 {
+pub fn solve_part2(input: &Vec<i64>) -> i64 {
     let mut max_signal = 0;
     for phases in permute::permute(vec![5, 6, 7, 8, 9]) {
         let mut circuit = AmplifierCircuit::new(input, phases);

@@ -1,29 +1,29 @@
 use crate::intcode::VM;
 
 #[aoc_generator(day2)]
-pub fn prepare_input(input: &str) -> Vec<i32> {
+pub fn prepare_input(input: &str) -> Vec<i64> {
     let mut tokens = prepare_test_input(input);
     tokens[1] = 12; //noun
     tokens[2] = 2; //verb
     tokens
 
 }
-pub fn prepare_test_input(input: &str) -> Vec<i32> {
-    let tokens: Vec<i32> = input.trim().split(",")
-        .map(|token| token.parse::<i32>().unwrap())
+pub fn prepare_test_input(input: &str) -> Vec<i64> {
+    let tokens: Vec<i64> = input.trim().split(",")
+        .map(|token| token.parse::<i64>().unwrap())
         .collect();
     tokens
 }
 
 #[aoc(day2, part1)]
-pub fn solve_part1(input: &Vec<i32>) -> i32 {
+pub fn solve_part1(input: &Vec<i64>) -> i64 {
     let mut vm = VM::new(input.clone(), Vec::new());
     vm.run();
     vm.get(0)
 }
 
 #[aoc(day2, part2)]
-pub fn solve_part2(input: &Vec<i32>) -> i32 {
+pub fn solve_part2(input: &Vec<i64>) -> i64 {
     for noun in 0..100 {
         for verb in 0..100 {
             let mut input_clone = input.clone();
