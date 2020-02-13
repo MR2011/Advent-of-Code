@@ -13,7 +13,7 @@ enum Opcode {
     Halt,
 }
 
-#[derive(Debug, PartialEq, Copy, Clone)]
+#[derive(Debug, PartialEq, Copy, Clone, Hash, Eq)]
 pub enum State {
     Halted,
     NeedInput,
@@ -76,6 +76,7 @@ impl Instruction {
     }
 }
 
+#[derive(Clone, Hash, Eq, PartialEq)]
 pub struct VM {
     ip: usize,
     memory: Vec<i64>,
