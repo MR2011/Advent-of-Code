@@ -1,6 +1,7 @@
 module Helpers
   ( readInts,
     readCommaSeparatedInts,
+    readCommaSeparatedIntsString,
     mostCommon,
     leastCommon,
     invertBinary,
@@ -18,12 +19,12 @@ readInts :: FilePath -> IO [Int]
 readInts filePath =
   map read . lines <$> (readFile =<< getDataFileName filePath)
 
--- readCommaSeparatedInts :: FilePath -> IO [Int]
--- readCommaSeparatedInts filePath =
---   map read . splitOn "," <$> (readFile =<< getDataFileName filePath)
+readCommaSeparatedInts :: FilePath -> IO [Int]
+readCommaSeparatedInts filePath =
+  map read . splitOn "," <$> (readFile =<< getDataFileName filePath)
 
-readCommaSeparatedInts :: String -> [Int]
-readCommaSeparatedInts = map read . splitOn ","
+readCommaSeparatedIntsString :: String -> [Int]
+readCommaSeparatedIntsString = map read . splitOn ","
 
 mostCommon :: Ord a => [a] -> a
 mostCommon = head . maximumBy (comparing length) . group . sort

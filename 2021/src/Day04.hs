@@ -13,7 +13,7 @@ import Data.List
   )
 import Data.List.Split.Internals (chunksOf)
 import Helpers
-  ( readCommaSeparatedInts,
+  ( readCommaSeparatedIntsString,
   )
 import Paths_advent_of_code (getDataFileName)
 
@@ -51,7 +51,7 @@ input :: IO ([Int], [BingoBoard])
 input = do
   l <-
     filter (/= []) . lines <$> (readFile =<< getDataFileName "inputs/day04.txt")
-  let firstRow = readCommaSeparatedInts $ head l
+  let firstRow = readCommaSeparatedIntsString $ head l
   let bingoBoards = chunksOf 5 $ map (map ((,False) . read) . words) $ tail l
   return (firstRow, bingoBoards)
 
