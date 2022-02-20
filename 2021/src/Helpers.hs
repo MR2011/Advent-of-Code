@@ -6,6 +6,7 @@ module Helpers
     leastCommon,
     invertBinary,
     stringToDec,
+    enumerate
   )
 where
 
@@ -38,3 +39,6 @@ invertBinary = map (\c -> "10" !! read [c])
 
 stringToDec :: String -> Int
 stringToDec = foldl' (\acc x -> acc * 2 + digitToInt x) 0
+
+enumerate :: [b] -> [(Int, b)]
+enumerate = zip [0 ..]
