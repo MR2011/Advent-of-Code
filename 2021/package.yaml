@@ -24,6 +24,7 @@ dependencies:
 - split
 - timeit
 - containers
+- parsec
 library:
   source-dirs: src
 
