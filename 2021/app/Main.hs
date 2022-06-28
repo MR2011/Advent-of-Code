@@ -26,6 +26,7 @@ import           Day21
 import           Day22
 import           Day23
 import           Day24
+import           Day25
 
 main :: IO ()
 main = do
@@ -56,6 +57,7 @@ run  21 = runPretty 21 (Day21.part1, Day21.part2)
 run  22 = runPretty 22 (Day22.part1, Day22.part2)
 run  23 = runPretty 23 (Day23.part1, Day23.part2)
 run  24 = runPretty 24 (Day24.part1, Day24.part2)
+run  25 = runPretty 25 (Day25.part1, Day25.part2)
 
 runPretty :: (Show a, Show b) => Int -> (IO a, IO b) -> IO ()
 runPretty day (part1, part2) = do
