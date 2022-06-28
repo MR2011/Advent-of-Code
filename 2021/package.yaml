@@ -25,6 +25,7 @@ dependencies:
 - timeit
 - containers
 - parsec
+- search-algorithms
 library:
   source-dirs: src
 
