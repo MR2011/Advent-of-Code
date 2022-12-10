@@ -9,10 +9,7 @@ fn fully_contains(s1: Section, s2: Section) -> bool {
 }
 
 fn overlap(s1: Section, s2: Section) -> bool {
-    s1.min >= s2.min && s1.min <= s2.max
-        || s1.max >= s2.min && s1.max <= s2.max
-        || s2.min >= s1.min && s2.min <= s1.max
-        || s2.max >= s1.min && s2.max <= s1.max
+    !(s1.max < s2.min || s1.min > s2.max) 
 }
 
 pub fn create_sections(s: &str) -> (Section, Section) {
