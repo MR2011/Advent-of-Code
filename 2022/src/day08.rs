@@ -25,9 +25,13 @@ fn scenic_score((x, y): Coord, map: Map) -> usize {
     let tree = map[y][x];
     let max_x = map[0].len();
     let max_y = map.len();
+    // if on the edge, multiplication with 0 results in 0 score
     if x == 0 || x == (max_x-1) || y == 0 || y == (max_y-1) {
         return 0;
     }
+    // we stop once we encounter a tree which is >= tree so we have to add + 1
+    // to also consider this tree. always adding +1 allows us to skip checking
+    // the edges!
     let left = map[y][1..x].iter().rev().take_while(|&t| t < &tree).count() + 1;
     let right = map[y][x+1..max_x-1].iter().take_while(|&t| t < &tree).count() + 1;
     let top = map[1..y].iter().rev().take_while(|r| r[x] < tree).count() + 1;
