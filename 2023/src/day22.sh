@@ -34,9 +34,7 @@ drop() {
         peak=0
         for a in "${area[@]}"; do
             p="${peaks["$a"]}"
-            if [[ "$p" -gt "$peak" ]]; then
-                peak="$p"
-            fi
+            peak=$(( p > peak ? p : peak))
         done
         ((peak++))
 
